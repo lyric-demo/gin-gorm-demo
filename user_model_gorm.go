@@ -61,7 +61,9 @@ func (a UserGormEntityList) ToSchemaUserList() []*User {
 
 // NewUserGormModel 创建用户管理gorm存储实例
 func NewUserGormModel(db *gorm.DB) *UserGormModel {
+	// 自动映射数据表结构到数据库
 	db.AutoMigrate(new(UserGormEntity))
+
 	return &UserGormModel{
 		db: db,
 	}
