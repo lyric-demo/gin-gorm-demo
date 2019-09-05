@@ -4,9 +4,23 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
+
+	// 引入mysql驱动
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
+func newGormDB() *gorm.DB {
+	db, err := gorm.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local&allowNativePasswords=true")
+	if err != nil {
+		panic(err)
+	}
+	return db
+}
+
 func main() {
+	gdb := newGormDB()
+
 	// 创建gin引擎实例
 	app := gin.New()
 
@@ -17,7 +31,8 @@ func main() {
 	app.Use(gin.Recovery())
 
 	// 创建用户存储
-	userModel := NewUserMemoryModel()
+	userModel := NewUserGormModel(gdb)
+	// userModel := NewUserMemoryModel()
 
 	// 创建用户控制器
 	userCtl := NewUserCtl(userModel)
