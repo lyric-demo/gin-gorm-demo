@@ -30,6 +30,9 @@ func main() {
 	// 使用崩溃恢复中间件(全局注入)
 	app.Use(gin.Recovery())
 
+	// 使用验证用户中间件(全局注入)
+	app.Use(verifyUserMiddleware)
+
 	// 创建用户存储
 	userModel := NewUserGormModel(gdb)
 	// userModel := NewUserMemoryModel()
@@ -67,4 +70,21 @@ func main() {
 	if err != nil {
 		log.Fatalf("监听服务发生错误：%s", err.Error())
 	}
+}
+
+// 验证用户中间件
+// 中间件的作用是什么：
+// 拦截所有请求数据，统一处理公共业务（比如：记录所有请求日志、验证请求用户），同时把处理的业务数据放入上下文，在后续业务中可以从上下文中获取并使用
+// 如何实现一个中间件：
+// 中间件本质上是一个回调函数，特殊之处在于上下文处理及调用Next函数执行下一个中间件，以此类推
+func verifyUserMiddleware(c *gin.Context) {
+	token := c.GetHeader("Access-Token")
+	if token != "000000" {
+		c.JSON(401, gin.H{"message": "无效的访问令牌", "code": 0})
+		c.Abort()
+		return
+	}
+
+	c.Set("user_id", "root")
+	c.Next()
 }

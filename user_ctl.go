@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -19,8 +20,19 @@ type UserCtl struct {
 	UserModel IUserModel
 }
 
+// GetUserID 获取用户ID
+func (a *UserCtl) GetUserID(c *gin.Context) string {
+	userID, ok := c.Get("user_id")
+	if !ok {
+		return ""
+	}
+	return userID.(string)
+}
+
 // Query 查询用户数据
 func (a *UserCtl) Query(c *gin.Context) {
+	fmt.Println("当前访问用户ID：", a.GetUserID(c))
+
 	params := UserQueryParam{
 		UserName: c.Query("user_name"),
 	}
